@@ -62,16 +62,21 @@ namespace ImageCoverExpander
 
         private static void OnMenuSceneLoadedFresh()
         {
+            var mmvc = Resources.FindObjectsOfTypeAll<MainMenuViewController>().FirstOrDefault();
+            if (!mmvc) return;
+            mmvc.didFinishEvent += OnDidFinishEvent;
+        }
+
+        private static void OnDidFinishEvent(MainMenuViewController mmvc, MainMenuViewController.MenuButton _)
+        {
             var sldvc = Resources.FindObjectsOfTypeAll<StandardLevelDetailViewController>().FirstOrDefault();
             var ldvc = Resources.FindObjectsOfTypeAll<StandardLevelDetailView>().FirstOrDefault();
             if (!sldvc || !ldvc) return;
             var bcscc = ReflectionUtil.GetPrivateField<BeatmapCharacteristicSegmentedControlController>(ldvc, "_beatmapCharacteristicSegmentedControlController");
             var bdscc = ReflectionUtil.GetPrivateField<BeatmapDifficultySegmentedControlController>(ldvc, "_beatmapDifficultySegmentedControlController");
             if (!bcscc || !bdscc) return;
-            sldvc.didPresentContentEvent += (controller, type) => {
-                bcscc.didSelectBeatmapCharacteristicEvent += (controlController, so) => {
-                    RefreshButtonsBackgrounds<TextSegmentedControlCellNew>(bdscc);
-                };
+            sldvc.didPresentContentEvent += (sldvcController, type) => {
+                bcscc.didSelectBeatmapCharacteristicEvent += (controlController, so) => { RefreshButtonsBackgrounds<TextSegmentedControlCellNew>(bdscc); };
                 RefreshButtonsBackgrounds<IconSegmentedControlCell>(bcscc);
                 RefreshButtonsBackgrounds<TextSegmentedControlCellNew>(bdscc);
             };
@@ -81,7 +86,7 @@ namespace ImageCoverExpander
             var pscLayout = playerStatsContainer.GetComponent<LayoutElement>();
             var playContainer = bdscc.transform.parent;
             var levelInfoLayout = levelInfo.GetComponent<LayoutElement>();
-            if (!coverImage || !levelInfo || ! playerStatsContainer || !pscLayout || !playContainer || !levelInfoLayout) return;
+            if (!coverImage || !levelInfo || !playerStatsContainer || !pscLayout || !playContainer || !levelInfoLayout) return;
             coverImage.transform.localPosition = new Vector3(0, 0, coverImage.transform.localPosition.z);
             coverImage.transform.localScale = Vector3.one;
             coverImage.GetComponent<RectTransform>().sizeDelta = new Vector2(11, 11);
@@ -95,6 +100,7 @@ namespace ImageCoverExpander
             pscLayout.transform.SetParent(levelInfo);
             pscLayout.transform.localPosition = new Vector3(0, -10);
             levelInfoLayout.preferredHeight = 60;
+            mmvc.didFinishEvent -= OnDidFinishEvent;
         }
 
         public void OnApplicationStart() { }
