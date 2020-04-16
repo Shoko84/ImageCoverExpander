@@ -1,16 +1,15 @@
 ﻿using System.Collections;
 using System.Linq;
 using BS_Utils.Utilities;
-using FightSabers.Utilities;
 using HMUI;
 using ImageCoverExpander.Models;
+using ImageCoverExpander.Utilities;
 using IPA;
-using IPA.Config;
-using IPA.Utilities;
+using IPA.Config.Stores;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Component = UnityEngine.Component;
 using Config = IPA.Config.Config;
 using Image = UnityEngine.UI.Image;
 using IPALogger = IPA.Logging.Logger;
@@ -18,23 +17,30 @@ using ReflectionUtil = BS_Utils.Utilities.ReflectionUtil;
 
 namespace ImageCoverExpander
 {
-    public class Plugin : IBeatSaberPlugin
+    [Plugin(RuntimeOptions.SingleStartInit)]
+    public class Plugin
     {
-        internal static Ref<PluginConfig> config;
-        internal static IConfigProvider   configProvider;
+        #region Properties
 
-        public void Init(IPALogger logger, [Config.Prefer("json")] IConfigProvider cfgProvider)
+        public static IPALogger Log { get; private set; }
+
+        #endregion
+
+        #region BSIPA Events
+
+        [Init]
+        public Plugin(IPALogger logger, Config conf)
         {
-            Logger.log = logger;
-            BSEvents.menuSceneLoadedFresh += OnMenuSceneLoadedFresh;
-            configProvider = cfgProvider;
-
-            config = cfgProvider.MakeLink<PluginConfig>((p, v) => {
-                if (v.Value == null || v.Value.RegenerateConfig)
-                    p.Store(v.Value = new PluginConfig { RegenerateConfig = false });
-                config = v;
-            });
+            Log = logger;
+            PluginConfig.Instance = conf.Generated<PluginConfig>();
         }
+
+        [OnStart]
+        public void OnApplicationStart()
+        {
+            BSEvents.menuSceneLoadedFresh += OnMenuSceneLoadedFresh;
+        }
+        #endregion
 
         private static IEnumerator ChangeColor(IEventSystemHandler systemHandler, Image bg, Color c)
         {
@@ -56,7 +62,7 @@ namespace ImageCoverExpander
                 if (!bg)
                     bg = controlCell.GetComponent<Image>();
                 if (bg)
-                    new UnityTask(ChangeColor(controlCell, bg, Float4.ToColor(config.Value.ButtonColor)));
+                    new UnityTask(ChangeColor(controlCell, bg, Float4.ToColor(PluginConfig.Instance.ButtonColor)));
             }
         }
 
@@ -102,19 +108,5 @@ namespace ImageCoverExpander
             levelInfoLayout.preferredHeight = 60;
             mmvc.didFinishEvent -= OnDidFinishEvent;
         }
-
-        public void OnApplicationStart() { }
-
-        public void OnApplicationQuit() { }
-
-        public void OnFixedUpdate() { }
-
-        public void OnUpdate() { }
-
-        public void OnActiveSceneChanged(Scene prevScene, Scene nextScene) { }
-
-        public void OnSceneLoaded(Scene scene, LoadSceneMode sceneMode) { }
-
-        public void OnSceneUnloaded(Scene scene) { }
     }
 }

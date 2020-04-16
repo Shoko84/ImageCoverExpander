@@ -2,12 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/nike4613/ModSaber-MetadataFileSchema/master/Schema.json",
   "author": "Shoko84",
   "description": "Expands and customize the image cover container in the song selection!",
-  "gameVersion": "1.7.0",
+  "gameVersion": "1.8.0",
   "id": "ImageCoverExpander",
   "name": "ImageCoverExpander",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "dependsOn": {
-    "BS Utils": "^1.4.1"
+    "BS Utils": "^1.4.3"
   },
   "features": [],
   "links": {
