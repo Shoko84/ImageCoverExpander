@@ -94,7 +94,7 @@ namespace ImageCoverExpander
             var levelInfoLayout = levelInfo.GetComponent<LayoutElement>();
             if (!coverImage || !levelInfo || !playerStatsContainer || !pscLayout || !playContainer || !levelInfoLayout) return;
             coverImage.transform.localPosition = new Vector3(0, 0, coverImage.transform.localPosition.z);
-            coverImage.transform.localScale = Vector3.one;
+            coverImage.transform.localScale = Vector3.one * 0.925f;
             coverImage.GetComponent<RectTransform>().sizeDelta = new Vector2(11, 11);
             coverImage.GetComponent<RectTransform>().anchorMin = new Vector2(0, 0);
             coverImage.GetComponent<RectTransform>().anchorMax = new Vector2(1, 1);
